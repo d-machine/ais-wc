@@ -1,0 +1,11 @@
+{
+    "label": "First Name",
+    "placeholder": "Enter your first name",
+    "inputWidth": "300px",
+    "maxLength": 20,
+    "required": true,
+    "errorMessage": "Please enter a valid name",
+    "showClearButton": true,
+    "disabled": false
+  }
+  
