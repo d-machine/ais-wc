@@ -147,11 +147,6 @@ set inputValue(val) {
 
 handleInput(event) {
 this.value = event.target.value;
-this.dispatchEvent(new CustomEvent('input', {
-  detail: { value: this.value },
-  bubbles: true,
-  composed: true
-}));
 }
 }
 
