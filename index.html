@@ -59,21 +59,14 @@
 
 <script>
   document.getElementById('submitButton').addEventListener('click', () => {
-    // Get all input-text elements
     const inputElements = document.querySelectorAll('input-text');
     
     const formData = {};
-
-    // Iterate over each input-text component
     inputElements.forEach(input => {
-      const label = input.inputLabel; // Get the label of the input
-      const value = input.inputValue; // Get the value of the input
-
-      // Add the label-value pair to formData
+      const label = input.inputLabel; 
+      const value = input.inputValue; 
       formData[label] = value;
     });
-
-    // Log the formData object
     console.log(formData);
   });
 </script>
