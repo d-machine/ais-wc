@@ -132,6 +132,19 @@ return html`
 `;
 }
 
+get inputValue() {
+  return this.value;
+}
+
+get inputLabel() {
+  return this.label;
+}
+
+set inputValue(val) {
+  this.value = val;
+  this.requestUpdate();
+}
+
 handleInput(event) {
 this.value = event.target.value;
 this.dispatchEvent(new CustomEvent('input', {
