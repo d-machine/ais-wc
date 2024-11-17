@@ -1,270 +1,350 @@
 import { html, css, LitElement } from 'lit';
-import './TextInput';
 
 class DepartmentSelector extends LitElement {
-static styles = css`
-  :host {
-    font-family: 'Arial', sans-serif;
-    display: block;
-    margin: 0 auto;
-    max-width: 800px;
+  static styles = css`
+    :host {
+      font-family: 'Arial', sans-serif;
+      display: block;
+      margin: 0 auto;
+      width: var(--component-width, 100%);
+    }
+
+    .select-button {
+      padding: 10px 20px;
+      background-color: #f4f4f4;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 14px;
+    }
+
+    .select-button:hover {
+      background-color: #e7e7e7;
+    }
+
+    .modal-backdrop {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0, 0, 0, 0.5);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      z-index: 1000;
+    }
+
+    .modal {
+      background: white;
+      padding: 20px;
+      border-radius: 8px;
+      width: 90%;
+      max-width: 800px;
+      max-height: 80vh;
+      position: relative;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .close-button {
+      position: absolute;
+      top: -4px;
+      right: 0px;
+      background: none;
+      border: none;
+      font-size: 25px;
+      cursor: pointer;
+      padding: 5px;
+      z-index: 2;
+    }
+
+    .table-container {
+      overflow-y: auto;
+      max-height: calc(80vh - 40px);
+      position: relative;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: separate;
+      border-spacing: 0;
+    }
+
+    thead {
+      position: sticky;
+      top: 0;
+      z-index: 1;
+      background-color: white;
+    }
+
+    thead::after {
+      content: '';
+      position: absolute;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      border-bottom: 2px solid #ddd;
+    }
+
+    th, td {
+      padding: 12px;
+      border: 1px solid #ddd;
+      text-align: left;
+      background-color: inherit;
+    }
+
+    th {
+      background-color: #f4f4f4;
+      font-weight: bold;
+    }
+
+    tr:hover {
+      background-color: #f5f5f5;
+    }
+
+    .highlighted {
+      background-color: #e3f2fd;
+    }
+
+    .selected {
+      background-color: #bbdefb;
+    }
+
+    .checkbox {
+      cursor: pointer;
+      width: 16px;
+      height: 16px;
+    }
+
+    .checkbox-cell {
+      width: 40px;
+      text-align: center;
+    }
+
+    .input-text-container {
+      display: flex;
+      flex-direction: column;
+      width: 100%;
+      margin-bottom: 20px;
+    }
+
+    input-text {
+      width: 100%;
+    }
+
+    tbody tr:last-child td {
+      border-bottom: 1px solid #ddd;
+    }
+  `;
+
+  static properties = {
+    rows: { type: Array },
+    selectedRowIndex: { type: Number },
+    highlightedRowIndex: { type: Number },
+    selectedRow: { type: Object },
+    isModalOpen: { type: Boolean },
+    componentWidth: { type: String },
+  };
+
+  constructor() {
+    super();
+    this.rows = [
+      { id: 1, specialization: 'Data Science', shift: 'Morning', department: 'Computer Science' },
+      { id: 2, specialization: 'Drone Detection', shift: 'Afternoon', department: 'Electrical Engineering' },
+      { id: 3, specialization: 'Heat Reactor', shift: 'Evening', department: 'Mechanical Engineering' },
+      { id: 4, specialization: 'Bridge Structure', shift: 'Morning', department: 'Civil Engineering' },
+      { id: 5, specialization: 'Real Analysis', shift: 'Afternoon', department: 'Mathematics' },
+      { id: 6, specialization: 'Artificial Intelligence', shift: 'Morning', department: 'Computer Science' },
+      { id: 7, specialization: 'Quantum Computing', shift: 'Evening', department: 'Physics' },
+      { id: 8, specialization: 'Cybersecurity', shift: 'Afternoon', department: 'Information Technology' },
+      { id: 9, specialization: 'Geotechnical Engineering', shift: 'Morning', department: 'Civil Engineering' },
+      { id: 10, specialization: 'Econometrics', shift: 'Afternoon', department: 'Economics' },
+      { id: 11, specialization: 'Biomedical Engineering', shift: 'Morning', department: 'Biotechnology' },
+      { id: 12, specialization: 'Autonomous Vehicles', shift: 'Evening', department: 'Mechanical Engineering' },
+      { id: 13, specialization: 'Network Security', shift: 'Morning', department: 'Computer Science' },
+      { id: 14, specialization: 'Artificial Neural Networks', shift: 'Afternoon', department: 'Computer Science' },
+      { id: 15, specialization: 'Fluid Mechanics', shift: 'Morning', department: 'Mechanical Engineering' },
+      { id: 16, specialization: 'Structural Analysis', shift: 'Evening', department: 'Civil Engineering' },
+      { id: 17, specialization: 'Game Development', shift: 'Morning', department: 'Computer Science' },
+      { id: 18, specialization: 'Astrophysics', shift: 'Afternoon', department: 'Physics' },
+      { id: 19, specialization: 'Data Visualization', shift: 'Morning', department: 'Statistics' },
+      { id: 20, specialization: 'Telecommunication Networks', shift: 'Evening', department: 'Electrical Engineering' },
+      { id: 21, specialization: 'Applied Mathematics', shift: 'Morning', department: 'Mathematics' },
+      { id: 22, specialization: 'Microprocessor Design', shift: 'Afternoon', department: 'Electrical Engineering' },
+      { id: 23, specialization: 'Reinforcement Learning', shift: 'Morning', department: 'Computer Science' },
+      { id: 24, specialization: 'Robotics', shift: 'Afternoon', department: 'Mechanical Engineering' },
+      { id: 25, specialization: 'Sustainable Energy Systems', shift: 'Evening', department: 'Electrical Engineering' },
+      { id: 26, specialization: 'Digital Signal Processing', shift: 'Morning', department: 'Electrical Engineering' },
+      { id: 27, specialization: 'Pharmaceutical Sciences', shift: 'Afternoon', department: 'Biotechnology' },
+      { id: 28, specialization: 'Big Data Analytics', shift: 'Evening', department: 'Computer Science' },
+      { id: 29, specialization: 'Nuclear Engineering', shift: 'Morning', department: 'Mechanical Engineering' },
+      { id: 30, specialization: 'Economics Theory', shift: 'Afternoon', department: 'Economics' }
+    ];
+    
+    this.selectedRowIndex = -1;
+    this.highlightedRowIndex = -1;
+    this.selectedRow = null;
+    this.isModalOpen = false;
+    this.componentWidth = '100%';
   }
 
-  .input-container {
-    position: relative;
-    margin: 20px 0;
-    display: flex;
-    flex-direction: column;
-    align-items: flex-start;
+  firstUpdated() {
+    this.addEventListener('keydown', this.handleKeyDown);
+    this.updateStyles();
   }
 
-  .choose-button {
-    padding: 10px 20px;
-    background-color: #007bff;
-    color: white;
-    border: none;
-    cursor: pointer;
-    margin-top:10px;
-    margin-bottom: 10px;
-    align-self: center;
+  updated(changedProperties) {
+    if (changedProperties.has('componentWidth')) {
+      this.updateStyles();
+    }
   }
 
-  .choose-button:hover {
-    background-color: #0056b3;
+  updateStyles() {
+    this.style.setProperty('--component-width', this.componentWidth);
+
   }
 
-  .overlay.visible {
-    display: block;
+  disconnectedCallback() {
+    super.disconnectedCallback();
+    this.removeEventListener('keydown', this.handleKeyDown);
   }
 
-  .overlay {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: rgba(0, 0, 0, 0.6);
-    display: none;
-    z-index: 999;
+  openModal() {
+    this.isModalOpen = true;
+    this.highlightedRowIndex = this.selectedRowIndex >= 0 ? this.selectedRowIndex : 0;
+    setTimeout(() => {
+      const table = this.shadowRoot.querySelector('table');
+      if (table) table.focus();
+    }, 100);
   }
 
-  .modal {
-    background: white;
-    position: absolute;
-    top: 20%;
-    left: 50%;
-    transform: translateX(-50%);
-    padding: 20px;
-    border-radius: 8px;
-    width: 80%;
-    max-width: 600px;
-    overflow: hidden;
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 15px;
-    max-height: 400px;
-    overflow-y: auto;
-    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
+  closeModal() {
+    this.isModalOpen = false;
+    this.highlightedRowIndex = -1;
   }
 
-  .department-cell {
-    padding: 12px;
-    margin: 5px;
-    cursor: pointer;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-    transition: background-color 0.3s ease, transform 0.3s ease;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    text-align: center;
-    font-size: 16px;
-  }
-
-  .department-cell:hover {
-    background-color: #f0f0f0;
-    transform: scale(1.05);
-  }
-
-  .focused {
-    background-color: #007bff;
-    color: white;
-  }
-
-  .selected {
-    background-color: #28a745;
-    color: white;
-  }
-
-  .input-text-container {
-    display: flex;
-    flex-direction: column;
-    width: 100%;
-  }
-
-  input-text {
-    width: 100%;
-  }
-`;
-
-static properties = {
-  departments: { type: Array },
-  selectedDepartment: { type: String },
-  selectedDepartmentId: { type: Number },
-  isModalOpen: { type: Boolean },
-  activeCellIndex: { type: Number },
-  error: { type: String },
-};
-
-constructor() {
-  super();
-  this.departments = [
-    { id: 1, name: 'Computer Science' },
-    { id: 2, name: 'Electrical Engineering' },
-    { id: 3, name: 'Mechanical Engineering' },
-    { id: 4, name: 'Civil Engineering' },
-    { id: 5, name: 'Mathematics' },
-    { id: 6, name: 'Physics' },
-    { id: 7, name: 'Chemistry' },
-    { id: 8, name: 'Biology' },
-    { id: 9, name: 'Economics' }
-  ];
-  this.selectedDepartment = '';
-  this.selectedDepartmentId = null;
-  this.isModalOpen = false;
-  this.activeCellIndex = 0;
-}
-
-openModal() {
-  this.isModalOpen = true;
-  setTimeout(() => this.focusCell(), 0);
-}
-
-closeModal() {
-  this.isModalOpen = false;
-}
-
-handleCellHover(index) {
-  this.activeCellIndex = index;
-}
-
-handleCellClick(department) {
-  this.selectedDepartment = department.name; 
-  this.selectedDepartmentId = department.id;
-  this.fetchEmployeeData(department.id); 
-  this.closeModal();
-  this.requestUpdate();
-}
-
-async fetchEmployeeData(departmentId) {
-  console.log("Data fetching");
-  try {
-    const targetUrl = 'https://dummy.restapiexample.com/api/v1/employees';
-    const response = await fetch(targetUrl);
-    const data = await response.json();
-    console.log(`Employees in the department with ID: ${departmentId}`);
-    console.log(data);
-  } catch (error) {
-    console.error('Error fetching data:', error);
-  }
-}
-
-handleKeyDown(e) {
-  const rowSize = 3;
-  const maxIndex = this.departments.length - 1;
-
-  if (e.key === 'ArrowRight') {
-    console.log("key");
-    this.activeCellIndex = (this.activeCellIndex + 1) % this.departments.length;
-  } else if (e.key === 'ArrowLeft') {
-    console.log("key");
-    this.activeCellIndex = (this.activeCellIndex - 1 + this.departments.length) % this.departments.length;
-  } else if (e.key === 'ArrowDown') {
-    console.log("key");
-    this.activeCellIndex = Math.min(this.activeCellIndex + rowSize, maxIndex);
-  } else if (e.key === 'ArrowUp') {
-    console.log("key");
-    this.activeCellIndex = Math.max(this.activeCellIndex - rowSize, 0);
-  } else if (e.key === 'Enter') {
-    const selectedDepartment = this.departments[this.activeCellIndex];
-    this.selectedDepartment = selectedDepartment.name;
-    this.selectedDepartmentId = selectedDepartment.id;
-    this.fetchEmployeeData(selectedDepartment.id);
-    this.closeModal();
+  handleRowSelect(index) {
+    if (this.selectedRowIndex === index) {
+      this.selectedRowIndex = -1;
+      this.selectedRow = null;
+    } else {
+      this.selectedRowIndex = index;
+      this.selectedRow = this.rows[index];
+    }
     this.requestUpdate();
   }
-  e.preventDefault();
-}
 
-focusCell() {
-  const cells = this.shadowRoot.querySelectorAll('.department-cell');
-  if (cells.length > 0) {
-    cells[this.activeCellIndex].focus();
+  handleKeyDown(e) {
+    if (!this.isModalOpen) return;
+
+    const rowCount = this.rows.length;
+    let newIndex = this.highlightedRowIndex;
+
+    switch (e.key) {
+      case 'ArrowDown':
+      case 'ArrowRight':
+        newIndex = Math.min(this.highlightedRowIndex + 1, rowCount - 1);
+        break;
+      case 'ArrowUp':
+      case 'ArrowLeft':
+        newIndex = Math.max(this.highlightedRowIndex - 1, 0);
+        break;
+      case 'Enter':
+        if (this.highlightedRowIndex >= 0) {
+          this.handleRowSelect(this.highlightedRowIndex);
+          this.closeModal();
+        }
+        break;
+      case 'Escape':
+        this.closeModal();
+        break;
+      default:
+        return;
+    }
+
+    this.highlightedRowIndex = newIndex;
+    this.requestUpdate();
+    e.preventDefault();
   }
-}
 
-render() {
-  const selectedText = this.selectedDepartment || 'Select Department';
-
-  return html`
-    <div class="input-text-container">
-      <input-text 
-        label="Selected Department" 
-        name="department" 
-        input-type="text" 
-        input-width="100%" 
-        label-width="120px" 
-        readonly
-        .value="${selectedText}"
-        placeholder="Select Department"
-      ></input-text>
-      <button class="choose-button" @click="${this.openModal}">Choose Department</button>
-    </div>
-
-    <div
-      class="overlay ${this.isModalOpen ? 'visible' : ''}"
-      @click="${this.closeModal}"
-      tabindex="0"
-      role="dialog"
-      aria-labelledby="modalTitle"
-      aria-hidden="${!this.isModalOpen}"
-    >
-      <div class="modal" @click="${e => e.stopPropagation()}" @keydown="${this.handleKeyDown}">
-        <h2 id="modalTitle" class="visually-hidden">Select Department</h2>
-        ${this.departments.map(
-          (department, index) => html`
-            <div
-              class="department-cell ${this.selectedDepartment === department.name ? 'selected' : ''} ${this.activeCellIndex === index ? 'focused' : ''}"
-              @click="${() => this.handleCellClick(department)}"
-              @mouseenter="${() => this.handleCellHover(index)}"
-              tabindex="0"
-              role="button"
-              aria-selected="${this.selectedDepartment === department.name}"
-            >
-              ${department.name}
-            </div>
-          `
-        )}
+  render() {
+    return html`
+      <div class="input-text-container">
+        <input-text 
+          label="Selected Department" 
+          name="department" 
+          inputType="text" 
+          inputWidth="100%" 
+          labelWidth="150px" 
+          readonly
+          .value="${this.selectedRow ? `${this.selectedRow.specialization} - ${this.selectedRow.shift} - ${this.selectedRow.department}` : ''}"
+          placeholder="Select a department"
+        ></input-text>
+        <button class="select-button" @click="${this.openModal}">
+          <slot></slot>
+        </button>
       </div>
-    </div>
-  `;
-}
+
+      ${this.isModalOpen ? html`
+        <div class="modal-backdrop">
+          <div class="modal">
+            <button class="close-button" @click="${this.closeModal}">&times;</button>
+            <div class="table-container">
+              <table tabindex="0">
+                <thead>
+                  <tr>
+                    <th class="checkbox-cell">Select</th>
+                    <th>Specialization</th>
+                    <th>Shift</th>
+                    <th>Department</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  ${this.rows.map(
+                    (row, index) => html`
+                      <tr
+                        class="${this.getRowClasses(index)}"
+                        @click="${() => {
+                          this.handleRowSelect(index);
+                          this.closeModal();
+                        }}"
+                      >
+                        <td class="checkbox-cell">
+                          <input
+                            type="checkbox"
+                            class="checkbox"
+                            ?checked="${this.selectedRowIndex === index}"
+                            @click="${(e) => {
+                              e.stopPropagation();
+                              this.handleRowSelect(index);
+                              this.closeModal();
+                            }}"
+                          />
+                        </td>
+                        <td>${row.specialization}</td>
+                        <td>${row.shift}</td>
+                        <td>${row.department}</td>
+                      </tr>
+                    `
+                  )}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      ` : ''}
+    `;
+  }
+
+
+
+  getRowClasses(index) {
+    let classes = [];
+    if (index === this.highlightedRowIndex) classes.push('highlighted');
+    if (index === this.selectedRowIndex) classes.push('selected');
+    return classes.join(' ');
+  }
 }
 
 customElements.define('department-selector', DepartmentSelector);
-//gap,label and input in same line position --relative Edit/view toggle scroll radio button(1st col) make a form for submission
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
