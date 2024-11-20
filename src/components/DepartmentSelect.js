@@ -1,4 +1,10 @@
 import { html, css, LitElement } from 'lit';
+import './TableCell.js';
+import './TableRow.js';
+import './TableHeader.js';
+import './TableElement.js';
+
+
 
 class DepartmentSelector extends LitElement {
   static styles = css`
@@ -7,19 +13,6 @@ class DepartmentSelector extends LitElement {
       display: block;
       margin: 0 auto;
       width: var(--component-width, 100%);
-    }
-
-    .select-button {
-      padding: 10px 20px;
-      background-color: #f4f4f4;
-      border: 1px solid #ddd;
-      border-radius: 4px;
-      cursor: pointer;
-      font-size: 14px;
-    }
-
-    .select-button:hover {
-      background-color: #e7e7e7;
     }
 
     .modal-backdrop {
@@ -131,6 +124,7 @@ class DepartmentSelector extends LitElement {
 
     input-text {
       width: 100%;
+      cursor: pointer;
     }
 
     tbody tr:last-child td {
@@ -151,37 +145,21 @@ class DepartmentSelector extends LitElement {
     super();
     this.rows = [
       { id: 1, specialization: 'Data Science', shift: 'Morning', department: 'Computer Science' },
-      { id: 2, specialization: 'Drone Detection', shift: 'Afternoon', department: 'Electrical Engineering' },
-      { id: 3, specialization: 'Heat Reactor', shift: 'Evening', department: 'Mechanical Engineering' },
-      { id: 4, specialization: 'Bridge Structure', shift: 'Morning', department: 'Civil Engineering' },
-      { id: 5, specialization: 'Real Analysis', shift: 'Afternoon', department: 'Mathematics' },
-      { id: 6, specialization: 'Artificial Intelligence', shift: 'Morning', department: 'Computer Science' },
-      { id: 7, specialization: 'Quantum Computing', shift: 'Evening', department: 'Physics' },
-      { id: 8, specialization: 'Cybersecurity', shift: 'Afternoon', department: 'Information Technology' },
-      { id: 9, specialization: 'Geotechnical Engineering', shift: 'Morning', department: 'Civil Engineering' },
-      { id: 10, specialization: 'Econometrics', shift: 'Afternoon', department: 'Economics' },
-      { id: 11, specialization: 'Biomedical Engineering', shift: 'Morning', department: 'Biotechnology' },
-      { id: 12, specialization: 'Autonomous Vehicles', shift: 'Evening', department: 'Mechanical Engineering' },
-      { id: 13, specialization: 'Network Security', shift: 'Morning', department: 'Computer Science' },
-      { id: 14, specialization: 'Artificial Neural Networks', shift: 'Afternoon', department: 'Computer Science' },
-      { id: 15, specialization: 'Fluid Mechanics', shift: 'Morning', department: 'Mechanical Engineering' },
-      { id: 16, specialization: 'Structural Analysis', shift: 'Evening', department: 'Civil Engineering' },
-      { id: 17, specialization: 'Game Development', shift: 'Morning', department: 'Computer Science' },
-      { id: 18, specialization: 'Astrophysics', shift: 'Afternoon', department: 'Physics' },
-      { id: 19, specialization: 'Data Visualization', shift: 'Morning', department: 'Statistics' },
-      { id: 20, specialization: 'Telecommunication Networks', shift: 'Evening', department: 'Electrical Engineering' },
-      { id: 21, specialization: 'Applied Mathematics', shift: 'Morning', department: 'Mathematics' },
-      { id: 22, specialization: 'Microprocessor Design', shift: 'Afternoon', department: 'Electrical Engineering' },
-      { id: 23, specialization: 'Reinforcement Learning', shift: 'Morning', department: 'Computer Science' },
-      { id: 24, specialization: 'Robotics', shift: 'Afternoon', department: 'Mechanical Engineering' },
-      { id: 25, specialization: 'Sustainable Energy Systems', shift: 'Evening', department: 'Electrical Engineering' },
-      { id: 26, specialization: 'Digital Signal Processing', shift: 'Morning', department: 'Electrical Engineering' },
-      { id: 27, specialization: 'Pharmaceutical Sciences', shift: 'Afternoon', department: 'Biotechnology' },
-      { id: 28, specialization: 'Big Data Analytics', shift: 'Evening', department: 'Computer Science' },
-      { id: 29, specialization: 'Nuclear Engineering', shift: 'Morning', department: 'Mechanical Engineering' },
-      { id: 30, specialization: 'Economics Theory', shift: 'Afternoon', department: 'Economics' }
+        { id: 1, specialization: 'Data Science', shift: 'Morning', department: 'Computer Science' },
+        { id: 2, specialization: 'Drone Detection', shift: 'Afternoon', department: 'Electrical Engineering' },
+        { id: 3, specialization: 'Heat Reactor', shift: 'Evening', department: 'Mechanical Engineering' },
+        { id: 4, specialization: 'Bridge Structure', shift: 'Morning', department: 'Civil Engineering' },
+        { id: 5, specialization: 'Real Analysis', shift: 'Afternoon', department: 'Mathematics' },
+        { id: 6, specialization: 'Artificial Intelligence', shift: 'Morning', department: 'Computer Science' },
+        { id: 7, specialization: 'Quantum Computing', shift: 'Evening', department: 'Physics' },
+        { id: 8, specialization: 'Cybersecurity', shift: 'Afternoon', department: 'Information Technology' },
+        { id: 9, specialization: 'Geotechnical Engineering', shift: 'Morning', department: 'Civil Engineering' },
+        { id: 10, specialization: 'Econometrics', shift: 'Afternoon', department: 'Economics' },
+        { id: 11, specialization: 'Biomedical Engineering', shift: 'Morning', department: 'Biotechnology' },
+        { id: 12, specialization: 'Autonomous Vehicles', shift: 'Evening', department: 'Mechanical Engineering' },
+        { id: 13, specialization: 'Network Security', shift: 'Morning', department: 'Computer Science' },
     ];
-    
+
     this.selectedRowIndex = -1;
     this.highlightedRowIndex = -1;
     this.selectedRow = null;
@@ -194,20 +172,13 @@ class DepartmentSelector extends LitElement {
     this.updateStyles();
   }
 
-  updated(changedProperties) {
-    if (changedProperties.has('componentWidth')) {
-      this.updateStyles();
-    }
+  disconnectedCallback() {
+    super.disconnectedCallback();
+    this.removeEventListener('keydown', this.handleKeyDown);
   }
 
   updateStyles() {
     this.style.setProperty('--component-width', this.componentWidth);
-
-  }
-
-  disconnectedCallback() {
-    super.disconnectedCallback();
-    this.removeEventListener('keydown', this.handleKeyDown);
   }
 
   openModal() {
@@ -278,39 +249,31 @@ class DepartmentSelector extends LitElement {
           inputWidth="100%" 
           labelWidth="150px" 
           readonly
+          @dblclick="${this.openModal}"
           .value="${this.selectedRow ? `${this.selectedRow.specialization} - ${this.selectedRow.shift} - ${this.selectedRow.department}` : ''}"
           placeholder="Select a department"
         ></input-text>
-        <button class="select-button" @click="${this.openModal}">
-          <slot></slot>
-        </button>
       </div>
-
+  
       ${this.isModalOpen ? html`
         <div class="modal-backdrop">
           <div class="modal">
             <button class="close-button" @click="${this.closeModal}">&times;</button>
             <div class="table-container">
-              <table tabindex="0">
+              <table-element>
                 <thead>
-                  <tr>
-                    <th class="checkbox-cell">Select</th>
-                    <th>Specialization</th>
-                    <th>Shift</th>
-                    <th>Department</th>
-                  </tr>
+                  <table-row>
+                    <table-header>Select</table-header>
+                    <table-header>Specialization</table-header>
+                    <table-header>Shift</table-header>
+                    <table-header>Department</table-header>
+                  </table-row>
                 </thead>
                 <tbody>
                   ${this.rows.map(
                     (row, index) => html`
-                      <tr
-                        class="${this.getRowClasses(index)}"
-                        @click="${() => {
-                          this.handleRowSelect(index);
-                          this.closeModal();
-                        }}"
-                      >
-                        <td class="checkbox-cell">
+                      <table-row class="${this.getRowClasses(index)}">
+                        <table-cell>
                           <input
                             type="checkbox"
                             class="checkbox"
@@ -321,22 +284,22 @@ class DepartmentSelector extends LitElement {
                               this.closeModal();
                             }}"
                           />
-                        </td>
-                        <td>${row.specialization}</td>
-                        <td>${row.shift}</td>
-                        <td>${row.department}</td>
-                      </tr>
+                        </table-cell>
+                        <table-cell>${row.specialization}</table-cell>
+                        <table-cell>${row.shift}</table-cell>
+                        <table-cell>${row.department}</table-cell>
+                      </table-row>
                     `
                   )}
                 </tbody>
-              </table>
+              </table-element>
             </div>
           </div>
         </div>
       ` : ''}
     `;
   }
-
+  
 
 
   getRowClasses(index) {
