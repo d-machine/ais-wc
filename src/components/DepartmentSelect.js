@@ -4,8 +4,6 @@ import './TableRow.js';
 import './TableHeader.js';
 import './TableElement.js';
 
-
-
 class DepartmentSelector extends LitElement {
   static styles = css`
     :host {
@@ -27,7 +25,26 @@ class DepartmentSelector extends LitElement {
       align-items: center;
       z-index: 1000;
     }
+    .button-container {
+      display: flex;
+      justify-content: center;
+      gap:10px;
+      margin-top: 10px;
+    }
+      .add-row-button {
+      margin-top: 10px;
+      padding: 8px 16px;
+      background-color: #2196f3;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 14px;
+    }
 
+    .add-row-button:hover {
+      background-color: #1976d2;
+    }
     .modal {
       background: white;
       padding: 20px;
@@ -130,6 +147,14 @@ class DepartmentSelector extends LitElement {
     tbody tr:last-child td {
       border-bottom: 1px solid #ddd;
     }
+
+    input[type="text"] {
+      width: 100%;
+      padding: 5px;
+      box-sizing: border-box;
+      border: 1px solid #ddd;
+      background-color: #f9f9f9;
+    }
   `;
 
   static properties = {
@@ -139,32 +164,39 @@ class DepartmentSelector extends LitElement {
     selectedRow: { type: Object },
     isModalOpen: { type: Boolean },
     componentWidth: { type: String },
+    readonly: { type: Boolean, reflect: true }, // Reflect to attribute
   };
 
   constructor() {
     super();
     this.rows = [
       { id: 1, specialization: 'Data Science', shift: 'Morning', department: 'Computer Science' },
-        { id: 1, specialization: 'Data Science', shift: 'Morning', department: 'Computer Science' },
-        { id: 2, specialization: 'Drone Detection', shift: 'Afternoon', department: 'Electrical Engineering' },
-        { id: 3, specialization: 'Heat Reactor', shift: 'Evening', department: 'Mechanical Engineering' },
-        { id: 4, specialization: 'Bridge Structure', shift: 'Morning', department: 'Civil Engineering' },
-        { id: 5, specialization: 'Real Analysis', shift: 'Afternoon', department: 'Mathematics' },
-        { id: 6, specialization: 'Artificial Intelligence', shift: 'Morning', department: 'Computer Science' },
-        { id: 7, specialization: 'Quantum Computing', shift: 'Evening', department: 'Physics' },
-        { id: 8, specialization: 'Cybersecurity', shift: 'Afternoon', department: 'Information Technology' },
-        { id: 9, specialization: 'Geotechnical Engineering', shift: 'Morning', department: 'Civil Engineering' },
-        { id: 10, specialization: 'Econometrics', shift: 'Afternoon', department: 'Economics' },
-        { id: 11, specialization: 'Biomedical Engineering', shift: 'Morning', department: 'Biotechnology' },
-        { id: 12, specialization: 'Autonomous Vehicles', shift: 'Evening', department: 'Mechanical Engineering' },
-        { id: 13, specialization: 'Network Security', shift: 'Morning', department: 'Computer Science' },
+      { id: 2, specialization: 'Drone Detection', shift: 'Afternoon', department: 'Electrical Engineering' },
+      { id: 3, specialization: 'Heat Reactor', shift: 'Evening', department: 'Mechanical Engineering' },
+      { id: 4, specialization: 'Bridge Structure', shift: 'Morning', department: 'Civil Engineering' },
+      { id: 5, specialization: 'Real Analysis', shift: 'Afternoon', department: 'Mathematics' },
+      { id: 6, specialization: 'Artificial Intelligence', shift: 'Morning', department: 'Computer Science' },
+      { id: 7, specialization: 'Quantum Computing', shift: 'Evening', department: 'Physics' },
+      { id: 8, specialization: 'Cybersecurity', shift: 'Afternoon', department: 'Information Technology' },
+      { id: 9, specialization: 'Geotechnical Engineering', shift: 'Morning', department: 'Civil Engineering' },
+      { id: 10, specialization: 'Econometrics', shift: 'Afternoon', department: 'Economics' },
+      { id: 11, specialization: 'Biomedical Engineering', shift: 'Morning', department: 'Biotechnology' },
+      { id: 12, specialization: 'Autonomous Vehicles', shift: 'Evening', department: 'Mechanical Engineering' },
+      { id: 13, specialization: 'Network Security', shift: 'Morning', department: 'Computer Science' },
     ];
-
     this.selectedRowIndex = -1;
     this.highlightedRowIndex = -1;
     this.selectedRow = null;
     this.isModalOpen = false;
     this.componentWidth = '100%';
+    this.readonly = false;
+  }
+
+
+  updated(changedProperties) {
+    if (changedProperties.has('readonly')) {
+      this.readonly = this.hasAttribute('readonly');
+    }
   }
 
   firstUpdated() {
@@ -205,6 +237,22 @@ class DepartmentSelector extends LitElement {
     }
     this.requestUpdate();
   }
+  updated(changedProperties) {
+    if (changedProperties.has('readonly')) {
+      this.readonly = this.hasAttribute('readonly');
+      if (!this.readonly) {
+        this.rows = [
+          { id: 1, specialization: '', shift: '', department: '' },
+        ];
+      }
+    }
+  }
+
+  addNewRow() {
+    const newId = this.rows.length + 1;
+    this.rows = [...this.rows, { id: newId, specialization: '', shift: '', department: '' }];
+    this.requestUpdate();
+  }
 
   handleKeyDown(e) {
     if (!this.isModalOpen) return;
@@ -239,68 +287,98 @@ class DepartmentSelector extends LitElement {
     e.preventDefault();
   }
 
-  render() {
-    return html`
-      <div class="input-text-container">
-        <input-text 
-          label="Selected Department" 
-          name="department" 
-          inputType="text" 
-          inputWidth="100%" 
-          labelWidth="150px" 
-          readonly
-          @dblclick="${this.openModal}"
-          .value="${this.selectedRow ? `${this.selectedRow.specialization} - ${this.selectedRow.shift} - ${this.selectedRow.department}` : ''}"
-          placeholder="Select a department"
-        ></input-text>
-      </div>
-  
-      ${this.isModalOpen ? html`
-        <div class="modal-backdrop">
-          <div class="modal">
-            <button class="close-button" @click="${this.closeModal}">&times;</button>
-            <div class="table-container">
-              <table-element>
-                <thead>
-                  <table-row>
-                    <table-header>Select</table-header>
-                    <table-header>Specialization</table-header>
-                    <table-header>Shift</table-header>
-                    <table-header>Department</table-header>
-                  </table-row>
-                </thead>
-                <tbody>
-                  ${this.rows.map(
-                    (row, index) => html`
-                      <table-row class="${this.getRowClasses(index)}">
-                        <table-cell>
-                          <input
-                            type="checkbox"
-                            class="checkbox"
-                            ?checked="${this.selectedRowIndex === index}"
-                            @click="${(e) => {
-                              e.stopPropagation();
-                              this.handleRowSelect(index);
-                              this.closeModal();
-                            }}"
-                          />
-                        </table-cell>
-                        <table-cell>${row.specialization}</table-cell>
-                        <table-cell>${row.shift}</table-cell>
-                        <table-cell>${row.department}</table-cell>
-                      </table-row>
-                    `
-                  )}
-                </tbody>
-              </table-element>
-            </div>
-          </div>
-        </div>
-      ` : ''}
-    `;
-  }
-  
+  handleCellEdit(e, rowIndex, column) {
+    if (this.readonly) return;
 
+    const newValue = e.target.value;
+    this.rows[rowIndex][column] = newValue;
+    this.requestUpdate();
+  }
+
+render() {
+  return html`
+    <div class="input-text-container">
+      <input-text 
+        label="${this.readonly ? 'Selected Department' : ''}" 
+        name="department" 
+        inputType="text" 
+        inputWidth="100%" 
+        labelWidth="150px" 
+        readonly
+        @dblclick="${this.openModal}"
+        .value="${this.selectedRow ? `${this.selectedRow.specialization} ` : ''}"
+        placeholder="Select a department"
+        placeholder="${this.readonly ? 'Select a department' : 'Write department'}"
+      ></input-text>
+    </div>
+
+    ${this.isModalOpen ? html`
+      <div class="modal-backdrop">
+        <div class="modal">
+          <button class="close-button" @click="${this.closeModal}">&times;</button>
+          <div class="table-container">
+            <table-element>
+              <thead>
+                <table-row>
+                  ${!this.readonly ? '' : html`<table-header>Select</table-header>`}
+                  <table-header>Specialization</table-header>
+                  <table-header>Shift</table-header>
+                  <table-header>Department</table-header>
+                </table-row>
+              </thead>
+              <tbody>
+                ${this.rows.map((row, index) => html`
+                  <tr class="${this.getRowClasses(index)}">
+                    ${!this.readonly ? '' : html`
+                      <table-cell class="checkbox-cell">
+                        <input type="checkbox" 
+                          .checked="${this.selectedRowIndex === index}" 
+                          @click="${() => {this.handleRowSelect(index);
+                                    this.closeModal();}}" 
+                          class="checkbox" />
+                      </table-cell>
+                    `}
+                    <td><input 
+                        type="text" 
+                        .value="${row.specialization}" 
+                        @input="${(e) => this.handleCellEdit(e, index, 'specialization')}" 
+                        ?readonly="${this.readonly}" 
+                        ?disabled="${this.readonly}" 
+                        /></td>
+                    <td><input 
+                        type="text" 
+                        .value="${row.shift}" 
+                        @input="${(e) => this.handleCellEdit(e, index, 'shift')}" 
+                        ?readonly="${this.readonly}" 
+                        ?disabled="${this.readonly}" 
+                        /></td>
+                    <td><input 
+                        type="text" 
+                        .value="${row.department}" 
+                        @input="${(e) => this.handleCellEdit(e, index, 'department')}" 
+                        ?readonly="${this.readonly}" 
+                        ?disabled="${this.readonly}" 
+                        /></td>
+                  </tr>
+                `)}
+              </tbody>
+            </table-element>
+          </div>
+               ${!this.readonly ? html`
+              <div class="button-container">
+                <button class="add-row-button" @click="${this.addNewRow}">
+                  Add Row
+                </button>
+                <button class="add-row-button" @click="${this.addNewRow}">
+                  Add data
+                </button>
+              </div>
+            ` : ''}
+        </div>
+      </div>
+    ` : ''}
+  `;
+}
 
   getRowClasses(index) {
     let classes = [];
@@ -308,6 +386,18 @@ class DepartmentSelector extends LitElement {
     if (index === this.selectedRowIndex) classes.push('selected');
     return classes.join(' ');
   }
+
+get getRows(){
+  if(this.readonly){
+    return this.selectedRow
+  }
+  else{
+    return this.rows;
+
+  }
+
+}
+
 }
 
 customElements.define('department-selector', DepartmentSelector);
